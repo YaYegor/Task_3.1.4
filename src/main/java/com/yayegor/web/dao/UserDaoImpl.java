@@ -42,11 +42,19 @@ public class UserDaoImpl implements UserDao{
         userToBeUpdated.setName(user.getName());
         userToBeUpdated.setSurname(user.getSurname());
         userToBeUpdated.setEmail(user.getEmail());
+        userToBeUpdated.setPassword(user.getPassword());
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
         entityManager.remove(entityManager.find(User.class, id));
+    }
+
+    @Override
+    public User getUserByName(String name) {
+        return entityManager.createQuery("select u from User u where u.name = :name", User.class)
+                .setParameter("name", name)
+                .getSingleResult();
     }
 }
