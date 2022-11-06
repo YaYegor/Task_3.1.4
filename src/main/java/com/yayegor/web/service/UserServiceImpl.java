@@ -3,7 +3,6 @@ package com.yayegor.web.service;
 
 import com.yayegor.web.dao.RoleDao;
 import com.yayegor.web.dao.UserDao;
-import com.yayegor.web.model.Role;
 import com.yayegor.web.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,9 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -46,13 +43,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     @Override
-    public void addUser(User user, long[] roles) {
-        Set<Role> rolesSet = new HashSet<>();
-        for (long role : roles) {
-            rolesSet.add(roleDao.getRoleById(role));
-        }
+    public void addUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(rolesSet);
         userDao.addUser(user);
     }
 
@@ -64,13 +56,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     @Override
-    public void updateUser(User user, long[] roleId) {
-        Set<Role> rolesSet = new HashSet<>();
-        for (long l : roleId) {
-            rolesSet.add(roleDao.getRoleById(l));
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(rolesSet);
+    public void updateUser(User user, Long id) {
+        user.setId(id);
+        user.setPassword(user.getPassword() != null &&
+                !user.getPassword().trim().equals("") ? passwordEncoder.encode(user.getPassword()) :
+                userDao.getUserById(id).getPassword());
         userDao.updateUser(user);
     }
 

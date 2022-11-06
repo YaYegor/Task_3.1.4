@@ -3,7 +3,6 @@ package com.yayegor.web.dao;
 import com.yayegor.web.model.User;
 import org.springframework.stereotype.Repository;
 
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;

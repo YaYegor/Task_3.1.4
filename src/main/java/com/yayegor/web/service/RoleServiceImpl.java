@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -20,12 +19,11 @@ public class RoleServiceImpl implements RoleService {
         this.roleDao = roleDao;
     }
 
-
     @Override
-    public Set<Role> findRolesByName(String roleName) {
+    public Set<Role> findRolesByName(String name) {
         Set<Role> roles = new HashSet<>();
         for (Role role : getRoles()) {
-            if (roleName.contains(role.getRoleName())) {
+            if (name.contains(role.getName())) {
                 roles.add(role);
             }
         }
@@ -34,7 +32,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roleDao.getRoles();
     }
 }

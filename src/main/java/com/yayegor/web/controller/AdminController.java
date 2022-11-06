@@ -1,17 +1,20 @@
 package com.yayegor.web.controller;
 
+import com.yayegor.web.model.Role;
 import com.yayegor.web.model.User;
 import com.yayegor.web.service.RoleService;
 import com.yayegor.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Set;
 
-@Controller
-@RequestMapping("/admin")
+@RestController
+@RequestMapping("/api")
 public class AdminController {
 
     private final UserService userService;
@@ -23,33 +26,41 @@ public class AdminController {
         this.roleService = roleService;
     }
 
-    @GetMapping
-    public String getAllUsers(Model model, Principal principal) {
-        model.addAttribute("admin", userService.getUserByName(principal.getName()));
-        model.addAttribute("users", userService.getAllUsers());
-        model.addAttribute("roles", roleService.getRoles());
-        model.addAttribute("user", new User());
-        return "index";
+    @GetMapping("/admin")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
 
-    @PostMapping("/new")
-    public String addUser(User user, @RequestParam("listRoles") long[] role_id) {
-        userService.addUser(user, role_id);
-        return "redirect:/admin";
+    @PostMapping("/admin")
+    public ResponseEntity<Void> addUser(@RequestBody User user) {
+        userService.addUser(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    @PatchMapping(value = "/update/{id}")
-    public String updateUser(@ModelAttribute("user") User user, @RequestParam ("listRoles") long[] roleId) {
-        userService.updateUser(user, roleId);
-        return "redirect:/admin";
+    @PatchMapping(value = "/admin/{id}")
+    public ResponseEntity<Void> updateUser(@RequestBody User user, @PathVariable Long id) {
+        userService.getUserById(id);
+        userService.updateUser(user, id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
+    @DeleteMapping("/admin/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin";
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<Set<Role>> getAllRoles() {
+        return new ResponseEntity<>(roleService.getRoles(), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/header")
+    public ResponseEntity<User> getAuthentication(Principal principal) {
+        User user = userService.getUserByName(principal.getName());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 }
