@@ -58,7 +58,8 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String name, String surname, String email,Set<Role> roles) {
+    public User(Long id, String name, String surname, String email,Set<Role> roles) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
@@ -67,6 +68,10 @@ public class User implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -89,11 +94,11 @@ public class User implements UserDetails {
         return email;
     }
 
-    public void setAge(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getRol() {
+    public String getRole() {
         return getRoles().toString().replaceAll("[,\\[\\]]" , "").
                 replaceAll("ROLE_","");
     }
