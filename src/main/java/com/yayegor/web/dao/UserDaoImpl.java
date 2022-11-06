@@ -2,53 +2,49 @@ package com.yayegor.web.dao;
 
 import com.yayegor.web.model.User;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+
 @Repository
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    @Transactional(readOnly = true)
-    public List<User> index() {
+    public List<User> getAllUsers() {
         return entityManager.createQuery("select u from User u", User.class).getResultList();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public User show(Long id) {
+    public User getUserById(Long id) {
         return entityManager.find(User.class, id);
     }
 
     @Override
-    @Transactional
-    public void save(User user) {
+    public void addUser(User user) {
         entityManager.persist(user);
-        entityManager.flush();
     }
 
     @Override
-    @Transactional
-    public void update(Long id, User user) {
-        User userToBeUpdated = entityManager.find(User.class, id);
-
-        userToBeUpdated.setName(user.getName());
-        userToBeUpdated.setSurname(user.getSurname());
-        userToBeUpdated.setEmail(user.getEmail());
-        userToBeUpdated.setPassword(user.getPassword());
+    public void deleteUser(Long id) {
+        try {
+            User user = entityManager.find(User.class, id);
+            if (user != null) {
+                entityManager.remove(user);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("User с указанным вами id не существует!");
+        }
     }
 
     @Override
-    @Transactional
-    public void delete(Long id) {
-        entityManager.remove(entityManager.find(User.class, id));
+    public void updateUser(User user) {
+        entityManager.merge(user);
     }
 
     @Override
