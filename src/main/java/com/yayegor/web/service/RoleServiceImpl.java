@@ -2,25 +2,24 @@ package com.yayegor.web.service;
 
 import com.yayegor.web.dao.RoleDao;
 import com.yayegor.web.model.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
-public class RoleServiceImpl implements RoleService{
+public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
 
+    @Autowired
     public RoleServiceImpl(RoleDao roleDao) {
         this.roleDao = roleDao;
     }
 
-    @Override
-    public List<Role> getRoles() {
-        return roleDao.getRoles();
-    }
 
     @Override
     public Set<Role> findRolesByName(String roleName) {
@@ -31,5 +30,11 @@ public class RoleServiceImpl implements RoleService{
             }
         }
         return roles;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Role> getRoles() {
+        return roleDao.getRoles();
     }
 }

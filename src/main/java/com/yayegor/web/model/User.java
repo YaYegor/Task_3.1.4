@@ -1,7 +1,8 @@
 package com.yayegor.web.model;
 
 
-import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -29,22 +30,43 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "users_roles",
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @JoinTable(
+            name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Role> roles;
 
-    public User(String name, String surname, String email, Set<Role> roles){
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getPasswordUser() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User() {
+    }
+
+    public User(String name, String surname, String email,Set<Role> roles) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.roles = roles;
     }
 
-    public User() {
-
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -67,30 +89,18 @@ public class User implements UserDetails {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setAge(String email) {
         this.email = email;
     }
 
-    public Long getId(){
-        return id;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public String getRol() {
+        return getRoles().toString().replaceAll("[,\\[\\]]" , "").
+                replaceAll("ROLE_","");
     }
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return name + " " + surname + " " + email;
     }
 
     @Override
@@ -100,7 +110,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return getPasswordUser();
     }
 
     @Override
@@ -126,9 +136,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }
